@@ -1,7 +1,13 @@
 #!/bin/bash
 
+# Output color.
+green=`tput setaf 2`
+reset=`tput sgr0`
+
 usage() {
     cat <<EOF
+
+${green}Welcome to CleanCodersGIT!${reset}
 
 Usage: $0 [options] [--] [file...]
 
@@ -12,6 +18,7 @@ Arguments:
 
   -h <command>, --help <command>
     Shows useful information about the given command.
+
 EOF
 }
 
@@ -21,25 +28,19 @@ error() { log "ERROR: $*" >&2; }
 fatal() { error "$*"; exit 1; }
 usage_fatal() { error "$*"; usage >&2; exit 1; }
 
-# Output color.
-green=`tput setaf 2`
-reset=`tput sgr0`
-
-printf "${green}Welcome to CleanCodersGIT!${reset}\n"
-
 if [ $# -eq 0 ]
 then
     usage
-fi
-
-# Same arg check as above but check if arg is empty str.
-# if [ -z "$1" ]
-# then
-#     echo "No argument supplied, if you need help, pass the --help flag."
-# fi
-
-# Initialize .git directory in current folder
-if [ $1 == "init" ]
-then
-    mkdir .git
+else
+    # Initialize .git directory in current folder
+    if [ $1 == "init" ]
+    then
+        mkdir .git
+    fi
+    
+    # TODO: modify this method to show current status in VC of files and folders
+    if [ $1 == "status" ]
+    then
+        ls
+    fi
 fi
