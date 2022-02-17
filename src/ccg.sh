@@ -35,7 +35,7 @@ else
     # Initialize .git directory in current folder
     if [ $1 == "init" ]
     then
-        mkdir .git
+        mkdir -p -m 777 .git
     fi
     
     # TODO: modify this method to show current status in VC of files and folders
