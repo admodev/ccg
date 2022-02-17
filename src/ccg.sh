@@ -36,6 +36,13 @@ else
     if [ $1 == "init" ]
     then
         mkdir -p -m 777 .git
+        declare -a references=("objects" "refs" "refs/heads")
+        for name in "${references[@]}"
+        do
+            mkdir .git/${name}
+        done
+        echo "ref: refs/heads/master" > .git/HEAD
+        echo "initialized empty repository."
     fi
     
     # TODO: modify this method to show current status in VC of files and folders
