@@ -84,11 +84,15 @@ else
         ls
     fi
 
+    # TODO: look for repository and append commit to that repo tree.
     if [ $1 == "commit" ]
     then
         commit_id="$(uuid)"
+        unix_timestamp=$(date +%s)
+        timestamp=$(date +%T)
         read -p "Enter commit message: " commit_message
         echo "Created commit with id: $commit_id"
         echo "Commit message: $commit_message"
+        echo "Created at: $timestamp"
     fi
 fi
