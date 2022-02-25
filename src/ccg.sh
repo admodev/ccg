@@ -61,6 +61,21 @@ uuid()
     echo
 }
 
+prompt_merge() {
+    while true; do
+        printf "Merge current branch into otherBranch (y/n) ? "
+        read answer || return 1
+        case "$answer" in
+            [yY])
+                return 0
+                ;;
+            [nN]*)
+                return 1
+                ;;
+        esac
+    done
+}
+
 if [ $# -eq 0 ]
 then
     usage
@@ -77,7 +92,7 @@ else
         echo "ref: refs/heads/master" > .git/HEAD
         echo "initialized empty repository."
     fi
-    
+
     # TODO: modify this method to show current status in VC of files and folders
     if [ $1 == "status" ]
     then
@@ -94,5 +109,10 @@ else
         echo "Created commit with id: $commit_id"
         echo "Commit message: $commit_message"
         echo "Created at: $timestamp"
+    fi
+
+    if [ $1 == "merge" ]
+    then
+        prompt_merge
     fi
 fi
