@@ -4,6 +4,7 @@ import (
     "fmt"
     "os"
     _ "log"
+    "github.com/satori/go.uuid"
 )
 
 // Terminal output colors
@@ -19,15 +20,32 @@ func helper() {
     return
 }
 
+func genUuid() uuid.UUID {
+    var uuid = uuid.NewV4()
+
+    fmt.Printf("Generated a new commit with id: %s \n", uuid)
+
+    return uuid
+}
+
 func main() {
     // Command line arguments
-    var arguments = os.Args
-
-    if len(arguments) < 2 {
-        helper()
-    }
-
     parseArgs := os.Args[1:]
 
-    fmt.Println(parseArgs)
+    if len(parseArgs) <= 0 {
+        helper()
+    } else {
+        for i := 0; i < len(parseArgs); i++ {
+            switch parseArgs[i] {
+            case "add":
+                fmt.Println("Added 5 files.")
+                break
+            case "commit":
+                genUuid()
+                break
+            default:
+                helper()
+            }
+        }
+    }
 }
