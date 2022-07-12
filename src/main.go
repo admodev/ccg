@@ -3,6 +3,7 @@ package main
 import (
     "fmt"
     "os"
+    "flag"
     _ "log"
     "github.com/satori/go.uuid"
 )
@@ -28,6 +29,16 @@ func genUuid() uuid.UUID {
     return uuid
 }
 
+// Iterate through a given path
+func scan(path string) {
+    print("scan")
+}
+
+// Generate GIT contributions graph
+func stats(email string) {
+    print("stats")
+}
+
 func main() {
     // Command line arguments
     parseArgs := os.Args[1:]
@@ -47,5 +58,17 @@ func main() {
                 helper()
             }
         }
+    }
+
+    // Test for contribution stats
+    var folder string
+    var email string
+    flag.StringVar(&folder, "add", "", "add a new folder to scan GIT repositories.")
+    flag.StringVar(&email, "email", "email@provider.com", "the email address to scan")
+    flag.Parse()
+
+    if folder != "" {
+        scan(folder)
+        return
     }
 }
