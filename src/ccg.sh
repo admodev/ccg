@@ -63,6 +63,7 @@ uuid()
 
 prompt_merge() {
     while true; do
+        # TODO!: Change "otherBranch" with the actual branch name...
         printf "Merge current branch into otherBranch (y/n) ? "
         read answer || return 1
         case "$answer" in
@@ -76,32 +77,25 @@ prompt_merge() {
     done
 }
 
-if [ $# -eq 0 ]
-then
-    usage
-else
-    # Initialize .git directory in current folder
-    if [ $1 == "init" ]
-    then
-        mkdir -p -m 777 .git
-        declare -a references=("objects" "refs" "refs/heads")
-        for name in "${references[@]}"
-        do
-            mkdir .git/${name}
-        done
-        echo "ref: refs/heads/master" > .git/HEAD
-        echo "initialized empty repository."
-    fi
+# Initialize .git directory in current folder
+init() {
+    mkdir -p -m 777 .git
+    declare -a references=("objects" "refs" "refs/heads")
+    for name in "${references[@]}"
+    do
+        mkdir .git/${name}
+    done
+    echo "ref: refs/heads/master" > .git/HEAD
+    echo "initialized empty repository."
+}
 
-    # TODO: modify this method to show current status in VC of files and folders
-    if [ $1 == "status" ]
-    then
-        ls
-    fi
+# TODO: modify this method to show current status in VC of files and folders
+status() {
+    ls
+}
 
     # TODO: look for repository and append commit to that repo tree.
-    if [ $1 == "commit" ]
-    then
+    commit() {
         commit_id="$(uuid)"
         unix_timestamp=$(date +%s)
         timestamp=$(date +%T)
@@ -109,10 +103,29 @@ else
         echo "Created commit with id: $commit_id"
         echo "Commit message: $commit_message"
         echo "Created at: $timestamp"
-    fi
+    }
 
-    if [ $1 == "merge" ]
+    for ARG in ${@}; do
+        case "$ARG" in
+            "init")
+                init
+                ;;
+            "status")
+                status
+                ;;
+            "commit")
+                commit
+                ;;
+            "merge")
+                prompt_merge
+                ;;
+            *)
+                usage
+                ;;
+        esac
+    done
+
+    if [ $# -eq 0 ]
     then
-        prompt_merge
+        usage
     fi
-fi
