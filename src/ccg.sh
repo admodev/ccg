@@ -90,7 +90,8 @@ init() {
 }
 
 # This function makes a .ssh directory with identiy file for different providers (GitHub, Gitlab, e.t.c.)
-# Params: #1 = provider #2 = your@email.com
+# Params: #1 = provider #2 = your@email.com #3 = your_username
+# Is it viable to change the order of parameters, to for example: #1 email #2 username #3 provider?
 set_identity() {
   dir = $HOME/.ssh
 
@@ -99,7 +100,24 @@ set_identity() {
     mkdir $dir
   fi
 
-  ssh-keygen -t ed25519 -C $2 -f $HOME/.ssh/$1
+  key = ssh-keygen -t ed25519 -C $2 -f $HOME/.ssh/$3_$1
+
+  if [ ! -f $HOME/.ssh/config ]
+  then
+    cat <<EOF
+      Host $1
+        User $3
+        IdentityFile $HOME/.ssh/$key
+        IdentitiesOnly yes
+EOF
+  else
+    % echo -e <<EOF
+      Host $1
+        User $3
+        IdentityFile $HOME/.ssh/$key
+        IdentitiesOnly yes
+EOF >> $HOME/.ssh/config
+  fi
 }
 
 # TODO: modify this method to show current status in VC of files and folders
