@@ -89,6 +89,19 @@ init() {
     echo "initialized empty repository."
 }
 
+# This function makes a .ssh directory with identiy file for different providers (GitHub, Gitlab, e.t.c.)
+# Params: #1 = provider #2 = your@email.com
+set_identity() {
+  dir = $HOME/.ssh
+
+  if [ ! -d $dir ]
+  then
+    mkdir $dir
+  fi
+
+  ssh-keygen -t ed25519 -C $2 -f $HOME/.ssh/$1
+}
+
 # TODO: modify this method to show current status in VC of files and folders
 status() {
     ls
