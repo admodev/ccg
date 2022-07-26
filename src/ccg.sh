@@ -94,17 +94,32 @@ init() {
 # Is it viable to change the order of parameters, to for example: #1 email #2 username #3 provider?
 set_identity() {
     dir = $HOME/.ssh
+    provider = ''
+    email = ''
+    username = ''
+
+    while getopts 'p:e:u:' flag; do
+        case "${flag}" in
+        p) provider="${OPTARG} ;;
+        e) email="${OPTARG} ;;
+        u) username="${OPTARG}" ;;
+        *)
+            usage
+            exit 1
+            ;;
+        esac
+    done
 
     if [ ! -d $dir ]; then
         mkdir $dir
     fi
 
-    key = ssh-keygen -t ed25519 -C $2 -f $HOME/.ssh/$3_$1
+    key = ssh-keygen -t ed25519 -C $email -f "${HOME}/.ssh/${username}_${provider}"
 
     if [ ! -f $HOME/.ssh/config ]; then
         cat <<EOF
       Host $1
-        User $3
+        User $username
         IdentityFile $HOME/.ssh/$key
         IdentitiesOnly yes
 EOF
@@ -112,7 +127,7 @@ EOF
         # NOTE: tee command only works on unix.
         tee -a $HOME/.ssh/config <<EOF
       Host $1
-        User $3
+        User $username
         IdentityFile $HOME/.ssh/$key
         IdentitiesOnly yes
 EOF
