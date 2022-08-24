@@ -82,7 +82,7 @@ prompt_merge() {
             return 0
             ;;
         [nN]*)
-            return 1
+            exit 1
             ;;
         esac
 }
@@ -107,10 +107,10 @@ init() {
 # Params: #1 = provider #2 = your@email.com #3 = your_username
 # Is it viable to change the order of parameters, to for example: #1 email #2 username #3 provider?
 set_identity() {
-    dir = $HOME/.ssh
-    provider = ''
-    email = ''
-    username = ''
+    dir=$HOME/.ssh
+    provider=''
+    email=''
+    username=''
 
     while getopts 'p:e:u:' flag; do
         case "${flag}" in
@@ -128,13 +128,13 @@ set_identity() {
         mkdir $dir
     fi
 
-    key = ssh-keygen -t ed25519 -C $email -f "${HOME}/.ssh/${username}_${provider}"
-
+    ssh-keygen -t ed25519 -C $email -f "${HOME}/.ssh/${username}_${provider}"
+    
     if [ ! -f $HOME/.ssh/config ]; then
         cat <<EOF
       Host $1
         User $username
-        IdentityFile $HOME/.ssh/$key
+        IdentityFile $HOME/.ssh/${username}_${provider}
         IdentitiesOnly yes
 EOF
     else
@@ -142,7 +142,7 @@ EOF
         tee -a $HOME/.ssh/config <<EOF
       Host $1
         User $username
-        IdentityFile $HOME/.ssh/$key
+        IdentityFile $HOME/.ssh/${username}_${provider}
         IdentitiesOnly yes
 EOF
     fi
@@ -168,7 +168,7 @@ commit() {
 
     if [[ ! $commit_message ]]; then
         echo "Please, enter a commit message..."
-        return 1
+        exit 1
     fi
 
     echo "Created commit with id: $commit_id"
