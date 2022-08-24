@@ -63,19 +63,24 @@ uuid() {
 }
 
 prompt_merge() {
-    while true; do
-        # TODO!: Change "otherBranch" with the actual branch name...
-        printf "Merge current branch into otherBranch (y/n) ? "
+    BRANCH=$1
+
+    if [[ ! $BRANCH ]]; then
+        echo "You need to specify a branch."
+        return 1
+    fi
+
+        printf "Merge current branch into ${BRANCH} (y/n) ? "
         read answer || return 1
         case "$answer" in
         [yY])
+            echo "Merging ${BRANCH}..."
             return 0
             ;;
         [nN]*)
             return 1
             ;;
         esac
-    done
 }
 
 # Initialize .git directory in current folder
@@ -145,6 +150,12 @@ commit() {
     unix_timestamp=$(date +%s)
     timestamp=$(date +%T)
     read -p "Enter commit message: " commit_message
+
+    if [[ ! $commit_message ]]; then
+        echo "Please, enter a commit message..."
+        return 1
+    fi
+
     echo "Created commit with id: $commit_id"
     echo "Commit message: $commit_message"
     echo "Created at: $timestamp"
@@ -165,11 +176,11 @@ for ARG in ${@}; do
         commit
         ;;
     "merge")
-        prompt_merge
+        prompt_merge $2
         ;;
-    *)
-        usage
-        ;;
+    # *)
+    #    usage
+    #    ;;
     esac
 done
 
