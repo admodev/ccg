@@ -1,7 +1,11 @@
 #!/bin/bash
 
 # Output color.
+black=$(tput setaf 0)
+red=$(tput setaf 1)
 green=$(tput setaf 2)
+yellow=$(tput setaf 3)
+white=$(tput setaf 7)
 reset=$(tput sgr0)
 
 usage() {
@@ -66,11 +70,11 @@ prompt_merge() {
     BRANCH=$1
 
     if [[ ! $BRANCH ]]; then
-        echo "You need to specify a branch."
-        return 1
+        echo ${red}"You need to specify a branch."${reset}
+        exit 1
     fi
 
-        printf "Merge current branch into ${BRANCH} (y/n) ? "
+        printf "Merge current branch into ${green}${BRANCH}${reset} (y/n) ? "
         read answer || return 1
         case "$answer" in
         [yY])
