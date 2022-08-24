@@ -93,7 +93,7 @@ init() {
 
     touch .git/.repos
     repository=([0]=0)
-    
+
     printf "%s\n" "${repository[@]}" > .git/.repos
     echo "ref: refs/heads/master" >.git/HEAD
     echo "initialized empty repository."
@@ -147,10 +147,12 @@ EOF
 # TODO: modify this method to show current status in VC of files and folders
 status() {
     ls
+    return 0
 }
 
 search_repo() {
-    ""
+    cat .git/.repos
+    return 0
 }
 
 # TODO: look for repository and append commit to that repo tree.
@@ -187,6 +189,7 @@ for ARG in ${@}; do
     "merge")
         prompt_merge $2
         ;;
+    # TODO!: apply usage when wrong args are passed
     # *)
     #    usage
     #    ;;
