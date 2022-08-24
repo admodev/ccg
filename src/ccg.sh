@@ -90,6 +90,11 @@ init() {
     for name in "${references[@]}"; do
         mkdir .git/${name}
     done
+
+    touch .git/.repos
+    repository=([0]=0)
+    
+    printf "%s\n" "${repository[@]}" > .git/.repos
     echo "ref: refs/heads/master" >.git/HEAD
     echo "initialized empty repository."
 }
@@ -142,6 +147,10 @@ EOF
 # TODO: modify this method to show current status in VC of files and folders
 status() {
     ls
+}
+
+search_repo() {
+    ""
 }
 
 # TODO: look for repository and append commit to that repo tree.
