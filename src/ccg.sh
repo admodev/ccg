@@ -128,23 +128,23 @@ set_identity() {
         mkdir $dir
     fi
 
-    ssh-keygen -t ed25519 -C $email -f "${HOME}/.ssh/${username}_${provider}"
+    yes | ssh-keygen -t ed25519 -C $email -f "${HOME}/.ssh/${username}_${provider}"
     
     if [ ! -f $HOME/.ssh/config ]; then
-        cat <<EOF
-      Host $1
+        cat > $HOME/.ssh/config <<- EOM
+        Host $1
         User $username
         IdentityFile $HOME/.ssh/${username}_${provider}
         IdentitiesOnly yes
-EOF
+EOM
     else
         # NOTE: tee command only works on unix.
-        tee -a $HOME/.ssh/config <<EOF
-      Host $1
+        tee -a $HOME/.ssh/config <<EOM
+        Host $1
         User $username
         IdentityFile $HOME/.ssh/${username}_${provider}
         IdentitiesOnly yes
-EOF
+EOM
     fi
 }
 
