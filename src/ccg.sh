@@ -67,24 +67,27 @@ uuid() {
 }
 
 prompt_merge() {
-    BRANCH=$1
+    while true
+    do
+        BRANCH=$1
 
-    if [[ ! $BRANCH ]]; then
-        echo ${red}"You need to specify a branch."${reset}
-        exit 1
-    fi
+        if [[ ! $BRANCH ]]; then
+            echo ${red}"You need to specify a branch."${reset}
+            exit 1
+        fi
 
         printf "Merge current branch into ${green}${BRANCH}${reset} (y/n) ? "
         read answer || return 1
         case "$answer" in
-        [yY])
-            echo "Merging ${BRANCH}..."
-            return 0
-            ;;
-        [nN]*)
-            exit 1
-            ;;
+            [yY]*)
+                echo "Merging ${BRANCH}..."
+                return 0
+                ;;
+            [nN]*)
+                exit 1
+                ;;
         esac
+    done
 }
 
 # Initialize .git directory in current folder
