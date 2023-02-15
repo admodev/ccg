@@ -69,10 +69,10 @@ uuid() {
 prompt_merge() {
     while true
     do
-        BRANCH=$1
-        DESTINATION_BRANCH=""
+        DESTINATION_BRANCH=$1
+        CURRENT_BRANCH=""
 
-        if [[ ! $BRANCH ]]; then
+        if [[ ! $DESTINATION_BRANCH ]]; then
             echo ${red}"You need to specify the version control system and the branch you want to merge."${reset}
             exit 1
         fi
@@ -82,14 +82,14 @@ prompt_merge() {
         case "$ans" in
             [gitGIT]*)
                 echo "Using GIT"
-                DESTINATION_BRANCH=`git branch | awk '{ print $2 }'`
+                CURRENT_BRANCH=`git branch | awk '{ print $2 }'`
 
-                printf "Merge current branch into ${green}${BRANCH}${reset} (y/n) ? "
+                printf "Merge branch ${green}${DESTINATION_BRANCH}${reset} into current branch (${CURRENT_BRANCH}) (y/n) ? "
 
                 read answer || return 1
                 case "$answer" in
                     [yY]*)
-                        printf "Merging $BRANCH into: $DESTINATION_BRANCH\n"
+                        printf "Merging $DESTINATION_BRANCH into: $CURRENT_BRANCH\n"
 
                         return 0
                         ;;
