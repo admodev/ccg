@@ -70,21 +70,34 @@ prompt_merge() {
     while true
     do
         BRANCH=$1
+        DESTINATION_BRANCH=""
 
         if [[ ! $BRANCH ]]; then
-            echo ${red}"You need to specify a branch."${reset}
+            echo ${red}"You need to specify the version control system and the branch you want to merge."${reset}
             exit 1
         fi
 
-        printf "Merge current branch into ${green}${BRANCH}${reset} (y/n) ? "
-        read answer || return 1
-        case "$answer" in
-            [yY]*)
-                echo "Merging ${BRANCH}..."
+        printf "Select which version control you are currently using: (g)it, (s)ubversion. "
+        read ans || return 1
+        case "$ans" in
+            [gitGIT]*)
+                echo "Using GIT"
+                DESTINATION_BRANCH=`git branch | awk '{ print $2 }'`
+
+                printf "Merge current branch into ${green}${BRANCH}${reset} (y/n) ? "
+
+                read answer || return 1
+                case "$answer" in
+                    [yY]*)
+                        printf "Merging $BRANCH into: $DESTINATION_BRANCH\n"
+
+                        return 0
+                        ;;
+                    [nN]*)
+                        exit 1
+                        ;;
+                esac
                 return 0
-                ;;
-            [nN]*)
-                exit 1
                 ;;
         esac
     done
