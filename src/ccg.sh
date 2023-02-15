@@ -91,6 +91,10 @@ prompt_merge() {
                     [yY]*)
                         printf "Merging $DESTINATION_BRANCH into: $CURRENT_BRANCH\n"
 
+                        git merge $DESTINATION_BRANCH
+
+                        echo "Done!"
+
                         return 0
                         ;;
                     [nN]*)
