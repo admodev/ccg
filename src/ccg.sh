@@ -84,7 +84,7 @@ prompt_merge() {
                 echo "Using GIT"
                 CURRENT_BRANCH=`git branch | awk '{ print $2 }'`
 
-                printf "Merge branch ${green}${DESTINATION_BRANCH}${reset} into current branch (${CURRENT_BRANCH}) (y/n) ? "
+                printf "Merge branch ${green}${DESTINATION_BRANCH}${reset} into ${CURRENT_BRANCH} (y/n) ? "
 
                 read answer || return 1
                 case "$answer" in
@@ -92,6 +92,7 @@ prompt_merge() {
                         printf "Merging $DESTINATION_BRANCH into: $CURRENT_BRANCH\n"
 
                         git merge $DESTINATION_BRANCH
+                        git push origin $DESTINATION_BRANCH
 
                         echo "Done!"
 
