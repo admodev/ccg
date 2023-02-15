@@ -92,9 +92,9 @@ prompt_merge() {
                         printf "Merging $DESTINATION_BRANCH into: $CURRENT_BRANCH\n"
 
                         git merge $DESTINATION_BRANCH
-                        git push origin $DESTINATION_BRANCH
+                        git push origin $CURRENT_BRANCH
 
-                        echo "Done!"
+                        echo "Branch merging finished successfully!"
 
                         return 0
                         ;;
