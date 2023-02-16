@@ -19,3 +19,14 @@ Our mission is to ship a piece of software that takes the best parts of mercuria
 ### Made with
 
 ![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black) ![Shell Script](https://img.shields.io/badge/shell_script-%23121011.svg?style=for-the-badge&logo=gnu-bash&logoColor=white)
+
+### Instructions
+
+To install this software you have to download the latest release from the "releases" section and add it to your path. Then you can use it globally with the ccg command.
+
+For instructions on how to use it run
+
+```bash
+ccg help
+```
+
