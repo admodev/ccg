@@ -169,10 +169,26 @@ EOM
     fi
 }
 
-# TODO: modify this method to show current status in VC of files and folders
 status() {
-    ls
-    return 0
+    while true
+    do
+        printf "Select which version control you are currently using: (g)it, (s)ubversion. "
+        read ans || return 1
+        case "$ans" in
+            [gitGIT]*)
+                echo "Using GIT"
+
+                git status
+
+                return 0
+                ;;
+            *)
+                printf "${red}Please, select at least one version control system...${reset}"
+
+                exit 1
+                ;;
+        esac
+    done
 }
 
 search_repo() {
