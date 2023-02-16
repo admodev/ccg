@@ -213,6 +213,16 @@ commit() {
     echo "Created at: $timestamp"
 }
 
+# Check content of a file before adding it to vc
+cat_file_contents() {
+    if [[ ! $1 ]]; then
+        printf "${red}Please, enter the name of the file you want to check.${reset}\n"
+        return 1
+    fi
+
+    find -name $1 -type f | xargs cat
+}
+
 for ARG in ${@}; do
     case "$ARG" in
     "identity")
@@ -229,6 +239,9 @@ for ARG in ${@}; do
         ;;
     "merge")
         prompt_merge $2
+        ;;
+    "check")
+        cat_file_contents $2
         ;;
     # TODO!: apply usage when wrong args are passed
     # *)
