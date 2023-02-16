@@ -220,7 +220,7 @@ cat_file_contents() {
         return 1
     fi
 
-    find -name $1 -type f | xargs cat
+    find -name $1* -type f | xargs cat
 }
 
 for ARG in ${@}; do
