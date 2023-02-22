@@ -248,6 +248,7 @@ push_to_vcs() {
         esac
 
         echo "Done!"
+        return 0
     done
 }
 
