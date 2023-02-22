@@ -243,10 +243,12 @@ for ARG in ${@}; do
     "check")
         cat_file_contents $2
         ;;
-    # TODO!: apply usage when wrong args are passed
-    # *)
-    #    usage
-    #    ;;
+    "help")
+        usage
+        ;;
+    *)
+        usage
+        ;;
     esac
 done
 
