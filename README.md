@@ -30,3 +30,6 @@ For instructions on how to use it run
 ccg --help
 ```
 
+### Authors
+
+admodev

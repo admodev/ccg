@@ -231,6 +231,7 @@ push_to_vcs() {
 
                 exit 1
                 ;;
+        esac
 
         read -p "Enter commit message: " commit_message
 
