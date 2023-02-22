@@ -27,6 +27,6 @@ To install this software you have to download the latest release from the "relea
 For instructions on how to use it run
 
 ```bash
-ccg help
+ccg --help
 ```
 
