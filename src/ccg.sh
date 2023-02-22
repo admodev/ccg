@@ -213,6 +213,43 @@ commit() {
     echo "Created at: $timestamp"
 }
 
+push_to_vcs() {
+    while true
+    do
+        printf "Add all unstaged files? (y)es, (n)o? "
+        read stagedFilesAnswer || return 1
+        case "$stagedFilesAnswer" in
+            [yY]*)
+                echo "Adding files..."
+                git add .
+                ;;
+            [nN]*)
+                echo "Please, select files to add: "
+                ;;
+            *)
+                printf "${red}Please, select at least one valid answer... (y)es or (n)o${reset}"
+
+                exit 1
+                ;;
+
+        read -p "Enter commit message: " commit_message
+
+        git commit -m commit_message
+
+        printf "Select branch: \n"
+        git branch
+        read branchAns || return 1
+        case "$branchAns" in
+            *)
+                echo "Pushing to $branchAns..."
+                git push origin $branchAns
+                ;;
+        esac
+
+        echo "Done!"
+    done
+}
+
 # Check content of a file before adding it to vc
 cat_file_contents() {
     if [[ ! $1 ]]; then
@@ -239,6 +276,9 @@ for ARG in ${@}; do
         ;;
     "merge")
         prompt_merge $2
+        ;;
+    "push")
+        push_to_vcs
         ;;
     "check")
         cat_file_contents $2
