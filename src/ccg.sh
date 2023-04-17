@@ -262,6 +262,10 @@ cat_file_contents() {
     find -name $1* -type f | xargs cat
 }
 
+fetch_all_and_pull() {
+  git fetch --all && git pull
+}
+
 for ARG in ${@}; do
     case "$ARG" in
     "identity")
@@ -285,6 +289,9 @@ for ARG in ${@}; do
     "check")
         cat_file_contents $2
         ;;
+    "fp")
+      fetch_all_and_pull
+      ;;
     "help")
         usage
         ;;
