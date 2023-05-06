@@ -266,6 +266,20 @@ fetch_all_and_pull() {
   git fetch --all && git pull
 }
 
+remove_files() {
+  printf "${red}Are you sure you want to PERMANENTLY DELETE those files?${reset}\n"
+
+  read filesAns || return 1
+    case "$filesAns" in
+      *)
+        echo "Deleting"
+        ls
+        ;;
+    esac
+
+    return 0
+}
+
 for ARG in ${@}; do
     case "$ARG" in
     "identity")
@@ -291,6 +305,9 @@ for ARG in ${@}; do
         ;;
     "fp")
       fetch_all_and_pull
+      ;;
+    "delete")
+      remove_files
       ;;
     "help")
         usage
