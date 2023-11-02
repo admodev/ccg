@@ -1,2 +1,5 @@
 # Build directory
 output/
+target/
+build/
+debug/

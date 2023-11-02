@@ -2,8 +2,6 @@
 
 ## CleanCodersGIT
 
-[![Open Source? Yes!](https://badgen.net/badge/Open%20Source%20%3F/Yes%21/blue?icon=github)](https://github.com/Naereen/badges/) [![GPL license](https://img.shields.io/badge/License-GPL-blue.svg)](http://perso.crans.org/besson/LICENSE.html)
-
 This software work is and will forever be free, you are free to modify it as long as you follow some guidelines to do so.
 
 - Clone this repository in your account and made all the changes or improvements you want.
@@ -18,7 +16,7 @@ Our mission is to ship a piece of software that takes the best parts of mercuria
 
 ### Made with
 
-![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black) ![Shell Script](https://img.shields.io/badge/shell_script-%23121011.svg?style=for-the-badge&logo=gnu-bash&logoColor=white)
+![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=for-the-badge&logo=rust&logoColor=white)
 
 ### Instructions
 
