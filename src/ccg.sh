@@ -259,11 +259,17 @@ cat_file_contents() {
         return 1
     fi
 
-    find -name $1* -type f | xargs cat
+    find -name $1* -type f | xargs less -R
 }
 
 fetch_all_and_pull() {
   git fetch --all && git pull
+}
+
+color_diff() {
+  git diff --color > colordiff.txt
+  less colordiff.txt
+  rm colordiff.txt
 }
 
 remove_files() {
@@ -305,6 +311,9 @@ for ARG in ${@}; do
         ;;
     "fp")
       fetch_all_and_pull
+      ;;
+    "diff")
+      color_diff
       ;;
     "delete")
       remove_files
