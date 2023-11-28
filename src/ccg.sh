@@ -128,44 +128,66 @@ init() {
 # Params: #1 = provider #2 = your@email.com #3 = your_username
 # Is it viable to change the order of parameters, to for example: #1 email #2 username #3 provider?
 set_identity() {
-    dir=$HOME/.ssh
-    provider=''
-    email=''
-    username=''
+    dir="$HOME/.ssh"
+    provider=""
+    email=""
+    username=""
 
-    while getopts 'p:e:u:' flag; do
-        case "${flag}" in
-        p) provider="${OPTARG} ;;
-        e) email="${OPTARG} ;;
-        u) username="${OPTARG}" ;;
-        *)
-            usage
-            exit 1
-            ;;
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            -p|--provider)
+                echo "Provider set"
+                PROVIDER="$2"
+                shift
+                shift
+                ;;
+            -e|--email)
+                echo "Email set"
+                EMAIL="$2"
+                shift
+                shift
+                ;;
+            -u|--username)
+                echo "Username set"
+                USERNAME="$2"
+                shift
+                shift
+                ;;
+            *)
+                shift
+                ;;
         esac
     done
 
-    if [ ! -d $dir ]; then
-        mkdir $dir
-    fi
+    if [ -n "$PROVIDER" ] && [ -n "$EMAIL" ] && [ -n "$USERNAME" ]; then
+        echo "The provider is: $PROVIDER"
+        echo "The email is: $EMAIL"
+        echo "The provider is: $USERNAME"
 
-    yes | ssh-keygen -t ed25519 -C $email -f "${HOME}/.ssh/${username}_${provider}"
-    
-    if [ ! -f $HOME/.ssh/config ]; then
-        cat > $HOME/.ssh/config <<- EOM
+        if [ ! -d $dir ]; then
+            mkdir $dir
+        fi
+
+        ssh-keygen -t ed25519 -C "$email" -N "" -f "$HOME/id_rsa" <<<y >/dev/null 2>&1
+
+        if [ ! -f $HOME/.ssh/config ]; then
+            cat > $HOME/.ssh/config <<- EOM
         Host $1
-        User $username
-        IdentityFile $HOME/.ssh/${username}_${provider}
+        User $USERNAME
+        IdentityFile $HOME/.ssh/${USERNAME}_${PROVIDER}
         IdentitiesOnly yes
 EOM
+        else
+            # NOTE: tee command only works on unix/linux.
+            tee -a $HOME/.ssh/config <<EOM
+        Host $1
+        User $USERNAME
+        IdentityFile $HOME/.ssh/${USERNAME}_${PROVIDER}
+        IdentitiesOnly yes
+EOM
+        fi
     else
-        # NOTE: tee command only works on unix.
-        tee -a $HOME/.ssh/config <<EOM
-        Host $1
-        User $username
-        IdentityFile $HOME/.ssh/${username}_${provider}
-        IdentitiesOnly yes
-EOM
+        printf "${RED}To use this command, please, pass the flags (-p)rovider, (-e)mail and (-u)sername.${RESET}\n"
     fi
 }
 
@@ -289,7 +311,7 @@ remove_files() {
 for ARG in ${@}; do
     case "$ARG" in
     "identity")
-        set_identity
+        set_identity "$@"
         ;;
     "init")
         init
