@@ -26,6 +26,54 @@ Arguments:
 EOF
 }
 
+help_command() {
+    case "$1" in
+        identity)
+            echo "Usage: $0 identity -p <provider> -e <email> -u <username>"
+            echo "Creates an SSH identity for the specified provider."
+            ;;
+        init)
+            echo "Usage: $0 init"
+            echo "Initializes an empty Git repository."
+            ;;
+        status)
+            echo "Usage: $0 status"
+            echo "Shows the status of the current repository."
+            ;;
+        commit)
+            echo "Usage: $0 commit"
+            echo "Creates a new commit with a unique ID and a commit message."
+            ;;
+        merge)
+            echo "Usage: $0 merge <destination-branch>"
+            echo "Merges the specified branch into the current branch."
+            ;;
+        push)
+            echo "Usage: $0 push"
+            echo "Pushes the current branch to the remote repository."
+            ;;
+        check)
+            echo "Usage: $0 check <file>"
+            echo "Displays the contents of the specified file."
+            ;;
+        fp)
+            echo "Usage: $0 fp"
+            echo "Fetches all branches and pulls the latest changes."
+            ;;
+        diff)
+            echo "Usage: $0 diff"
+            echo "Shows the colorized diff of the repository."
+            ;;
+        delete)
+            echo "Usage: $0 delete"
+            echo "Deletes specified files from the repository."
+            ;;
+        *)
+            echo "No help available for $1"
+            ;;
+    esac
+}
+
 # Error handling helper functions.
 log() { printf '%s\n' "$*"; }
 error() { log "ERROR: $*" >&2; }
@@ -343,6 +391,15 @@ for ARG in ${@}; do
     "help")
         usage
         ;;
+    "-h"|"--help")
+        if [[ $# -gt 1 ]]; then
+            help_command $2
+            exit 0
+        else
+            usage
+            exit 0
+        fi
+        ;;
     *)
         usage
         ;;
@@ -352,3 +409,4 @@ done
 if [ $# -eq 0 ]; then
     usage
 fi
+
