@@ -23,6 +23,18 @@ Arguments:
   -h <command>, --help <command>
     Shows useful information about the given command.
 
+Commands:
+  identity -p <provider> -e <email> -u <username>  Sets up an SSH identity for the given provider.
+  init                                             Initializes an empty Git repository.
+  status                                           Shows the status of the current repository.
+  commit                                           Creates a new commit with a unique ID and a commit message.
+  merge <destination-branch>                       Merges the specified branch into the current branch.
+  push                                             Pushes the current branch to the remote repository.
+  check <file>                                     Displays the contents of the specified file.
+  fp                                               Fetches all branches and pulls the latest changes.
+  diff                                             Shows the colorized diff of the repository.
+  delete                                           Deletes specified files from the repository.
+
 EOF
 }
 
@@ -92,13 +104,13 @@ uuid() {
     local N B T
 
     for ((N = 0; N < 16; ++N)); do
-        B=$(($RANDOM % 255))
+        B=$(($RANDOM % 256))
 
         if ((N == 6)); then
-            printf '4%x' $((B % 15))
+            printf '4%x' $((B % 16))
         elif ((N == 8)); then
             local C='89ab'
-            printf '%c%x' ${C:$(($RANDOM % ${#C})):1} $((B % 15))
+            printf '%c%x' ${C:$(($RANDOM % ${#C})):1} $((B % 16))
         else
             printf '%02x' $B
         fi
@@ -115,45 +127,41 @@ uuid() {
 }
 
 prompt_merge() {
-    while true
-    do
-        DESTINATION_BRANCH=$1
-        CURRENT_BRANCH=""
+    DESTINATION_BRANCH=$1
 
-        if [[ ! $DESTINATION_BRANCH ]]; then
-            echo ${red}"You need to specify the version control system and the branch you want to merge."${reset}
-            exit 1
-        fi
+    if [[ ! $DESTINATION_BRANCH ]]; then
+        echo ${red}"You need to specify the branch you want to merge."${reset}
+        exit 1
+    fi
 
-        printf "Select which version control you are currently using: (g)it, (s)ubversion. "
-        read ans || return 1
-        case "$ans" in
-            [gitGIT]*)
-                echo "Using GIT"
-                CURRENT_BRANCH=`git branch | awk '{ print $2 }'`
+    printf "Select which version control you are currently using: (g)it, (s)ubversion. "
+    read ans || return 1
+    case "$ans" in
+        [gitGIT]*)
+            echo "Using GIT"
+            CURRENT_BRANCH=$(git branch --show-current)
 
-                printf "Merge branch ${green}${DESTINATION_BRANCH}${reset} into ${CURRENT_BRANCH} (y/n) ? "
+            printf "Merge branch ${green}${DESTINATION_BRANCH}${reset} into ${CURRENT_BRANCH} (y/n) ? "
 
-                read answer || return 1
-                case "$answer" in
-                    [yY]*)
-                        printf "Merging $DESTINATION_BRANCH into: $CURRENT_BRANCH\n"
+            read answer || return 1
+            case "$answer" in
+                [yY]*)
+                    printf "Merging $DESTINATION_BRANCH into: $CURRENT_BRANCH\n"
 
-                        git merge $DESTINATION_BRANCH
-                        git push origin $CURRENT_BRANCH
+                    git merge $DESTINATION_BRANCH
+                    git push origin $CURRENT_BRANCH
 
-                        echo "Branch merging finished successfully!"
+                    echo "Branch merging finished successfully!"
 
-                        return 0
-                        ;;
-                    [nN]*)
-                        exit 1
-                        ;;
-                esac
-                return 0
-                ;;
-        esac
-    done
+                    return 0
+                    ;;
+                [nN]*)
+                    exit 1
+                    ;;
+            esac
+            return 0
+            ;;
+    esac
 }
 
 # Initialize .git directory in current folder
@@ -165,16 +173,11 @@ init() {
     done
 
     touch .git/.repos
-    repository=([0]=0)
-
-    printf "%s\n" "${repository[@]}" > .git/.repos
-    echo "ref: refs/heads/master" >.git/HEAD
+    echo "0" > .git/.repos
+    echo "ref: refs/heads/master" > .git/HEAD
     echo "initialized empty repository."
 }
 
-# This function makes a .ssh directory with identiy file for different providers (GitHub, Gitlab, e.t.c.)
-# Params: #1 = provider #2 = your@email.com #3 = your_username
-# Is it viable to change the order of parameters, to for example: #1 email #2 username #3 provider?
 set_identity() {
     dir="$HOME/.ssh"
     provider=""
@@ -184,20 +187,17 @@ set_identity() {
     while [[ $# -gt 0 ]]; do
         case $1 in
             -p|--provider)
-                echo "Provider set"
-                PROVIDER="$2"
+                provider="$2"
                 shift
                 shift
                 ;;
             -e|--email)
-                echo "Email set"
-                EMAIL="$2"
+                email="$2"
                 shift
                 shift
                 ;;
             -u|--username)
-                echo "Username set"
-                USERNAME="$2"
+                username="$2"
                 shift
                 shift
                 ;;
@@ -207,58 +207,44 @@ set_identity() {
         esac
     done
 
-    if [ -n "$PROVIDER" ] && [ -n "$EMAIL" ] && [ -n "$USERNAME" ]; then
-        echo "The provider is: $PROVIDER"
-        echo "The email is: $EMAIL"
-        echo "The provider is: $USERNAME"
-
+    if [ -n "$provider" ] && [ -n "$email" ] && [ -n "$username" ]; then
         if [ ! -d $dir ]; then
-            mkdir $dir
+            mkdir -p $dir
         fi
 
-        ssh-keygen -t ed25519 -C "$email" -N "" -f "$HOME/id_rsa" <<<y >/dev/null 2>&1
+        ssh-keygen -t ed25519 -C "$email" -N "" -f "$HOME/.ssh/id_${provider}_${username}" <<<y >/dev/null 2>&1
+
+        config_entry="
+Host ${provider}
+    User ${username}
+    IdentityFile $HOME/.ssh/id_${provider}_${username}
+    IdentitiesOnly yes
+"
 
         if [ ! -f $HOME/.ssh/config ]; then
-            cat > $HOME/.ssh/config <<- EOM
-        Host $1
-        User $USERNAME
-        IdentityFile $HOME/.ssh/${USERNAME}_${PROVIDER}
-        IdentitiesOnly yes
-EOM
+            echo "$config_entry" > $HOME/.ssh/config
         else
-            # NOTE: tee command only works on unix/linux.
-            tee -a $HOME/.ssh/config <<EOM
-        Host $1
-        User $USERNAME
-        IdentityFile $HOME/.ssh/${USERNAME}_${PROVIDER}
-        IdentitiesOnly yes
-EOM
+            grep -q "$provider" $HOME/.ssh/config || echo "$config_entry" >> $HOME/.ssh/config
         fi
     else
-        printf "${RED}To use this command, please, pass the flags (-p)rovider, (-e)mail and (-u)sername.${RESET}\n"
+        printf "${red}To use this command, please, pass the flags (-p)rovider, (-e)mail and (-u)sername.${reset}\n"
     fi
 }
 
 status() {
-    while true
-    do
-        printf "Select which version control you are currently using: (g)it, (s)ubversion. "
-        read ans || return 1
-        case "$ans" in
-            [gitGIT]*)
-                echo "Using GIT"
-
-                git status
-
-                return 0
-                ;;
-            *)
-                printf "${red}Please, select at least one version control system...${reset}"
-
-                exit 1
-                ;;
-        esac
-    done
+    printf "Select which version control you are currently using: (g)it, (s)ubversion. "
+    read ans || return 1
+    case "$ans" in
+        [gitGIT]*)
+            echo "Using GIT"
+            git status
+            return 0
+            ;;
+        *)
+            printf "${red}Please, select a valid version control system...${reset}\n"
+            exit 1
+            ;;
+    esac
 }
 
 search_repo() {
@@ -266,10 +252,8 @@ search_repo() {
     return 0
 }
 
-# TODO: look for repository and append commit to that repo tree.
 commit() {
     commit_id="$(uuid)"
-    unix_timestamp=$(date +%s)
     timestamp=$(date +%T)
     read -p "Enter commit message: " commit_message
 
@@ -281,119 +265,133 @@ commit() {
     echo "Created commit with id: $commit_id"
     echo "Commit message: $commit_message"
     echo "Created at: $timestamp"
+    # Assuming you want to record this in a log
+    echo "$commit_id - $commit_message - $timestamp" >> .git/commit_log
 }
 
 push_to_vcs() {
-    while true
-    do
-        printf "Add all unstaged files? (y)es, (n)o? "
-        read stagedFilesAnswer || return 1
-        case "$stagedFilesAnswer" in
-            [yY]*)
-                echo "Adding files..."
-                git add .
-                ;;
-            [nN]*)
-                echo "Please, select files to add: "
-                ;;
-            *)
-                printf "${red}Please, select at least one valid answer... (y)es or (n)o${reset}"
+    printf "Add all unstaged files? (y)es, (n)o? "
+    read stagedFilesAnswer || return 1
+    case "$stagedFilesAnswer" in
+        [yY]*)
+            echo "Adding files..."
+            git add .
+            ;;
+        [nN]*)
+            echo "Please, select files to add: "
+            read -e files_to_add
+            git add $files_to_add
+            ;;
+        *)
+            printf "${red}Please, select a valid option... (y)es or (n)o${reset}\n"
+            exit 1
+            ;;
+    esac
 
-                exit 1
-                ;;
-        esac
+    read -p "Enter commit message: " commit_message
 
-        read -p "Enter commit message: " commit_message
+    git commit -m "$commit_message"
 
-        git commit -m commit_message
+    printf "Select branch to push to: \n"
+    git branch
+    read branchAns || return 1
+    case "$branchAns" in
+        *)
+            echo "Pushing to $branchAns..."
+            git push origin $branchAns
+            ;;
+    esac
 
-        printf "Select branch: \n"
-        git branch
-        read branchAns || return 1
-        case "$branchAns" in
-            *)
-                echo "Pushing to $branchAns..."
-                git push origin $branchAns
-                ;;
-        esac
-
-        echo "Done!"
-        return 0
-    done
+    echo "Done!"
+    return 0
 }
 
-# Check content of a file before adding it to vc
 cat_file_contents() {
     if [[ ! $1 ]]; then
         printf "${red}Please, enter the name of the file you want to check.${reset}\n"
         return 1
     fi
 
-    find -name $1* -type f | xargs less -R
+    find . -name "$1*" -type f | xargs less -R
 }
 
 fetch_all_and_pull() {
-  git fetch --all && git pull
+    git fetch --all && git pull
 }
 
 color_diff() {
-  git diff --color > colordiff.txt
-  less colordiff.txt
-  rm colordiff.txt
+    git diff --color > colordiff.txt
+    less colordiff.txt
+    rm colordiff.txt
 }
 
 remove_files() {
-  printf "${red}Are you sure you want to PERMANENTLY DELETE those files?${reset}\n"
-
-  read filesAns || return 1
+    printf "${red}Are you sure you want to PERMANENTLY DELETE those files?${reset}\n"
+    read -p "Enter file names: " filesAns || return 1
     case "$filesAns" in
-      *)
-        echo "Deleting"
-        ls
-        ;;
+        *)
+            echo "Deleting $filesAns"
+            rm -f $filesAns
+            ;;
     esac
 
     return 0
 }
 
-for ARG in ${@}; do
+if [[ $# -eq 0 ]]; then
+    usage
+    exit 0
+fi
+
+for ARG in "$@"; do
     case "$ARG" in
-    "identity")
+    identity)
         set_identity "$@"
+        exit 0
         ;;
-    "init")
+    init)
         init
+        exit 0
         ;;
-    "status")
+    status)
         status
+        exit 0
         ;;
-    "commit")
+    commit)
         commit
+        exit 0
         ;;
-    "merge")
-        prompt_merge $2
+    merge)
+        prompt_merge "$2"
+        exit 0
         ;;
-    "push")
+    push)
         push_to_vcs
+        exit 0
         ;;
-    "check")
-        cat_file_contents $2
+    check)
+        cat_file_contents "$2"
+        exit 0
         ;;
-    "fp")
-      fetch_all_and_pull
-      ;;
-    "diff")
-      color_diff
-      ;;
-    "delete")
-      remove_files
-      ;;
-    "help")
+    fp)
+        fetch_all_and_pull
+        exit 0
+        ;;
+    diff)
+        color_diff
+        exit 0
+        ;;
+    delete)
+        remove_files
+        exit 0
+        ;;
+    help)
         usage
+        exit 0
         ;;
-    "-h"|"--help")
+    -h|--help)
         if [[ $# -gt 1 ]]; then
-            help_command $2
+            help_command "$2"
             exit 0
         else
             usage
@@ -402,11 +400,8 @@ for ARG in ${@}; do
         ;;
     *)
         usage
+        exit 0
         ;;
     esac
 done
-
-if [ $# -eq 0 ]; then
-    usage
-fi
 
