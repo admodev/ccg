@@ -7,12 +7,12 @@ mkdir -p "/tmp/ccg/"
 TODAY_FULLDATE=$(date +%F | sed s'/-/_/g')
 
 # Output color.
-black=$(tput setaf 0)
-red=$(tput setaf 1)
-green=$(tput setaf 2)
-yellow=$(tput setaf 3)
-white=$(tput setaf 7)
-reset=$(tput sgr0)
+export black=$(tput setaf 0)
+export red=$(tput setaf 1)
+export green=$(tput setaf 2)
+export yellow=$(tput setaf 3)
+export white=$(tput setaf 7)
+export reset=$(tput sgr0)
 
 usage() {
     cat <<EOF
@@ -172,8 +172,8 @@ prompt_merge() {
                 [yY]*)
                     printf "Merging $DESTINATION_BRANCH into: $CURRENT_BRANCH\n"
 
-                    git merge $DESTINATION_BRANCH
-                    git push origin $CURRENT_BRANCH
+                    git merge "$DESTINATION_BRANCH"
+                    git push origin "$CURRENT_BRANCH"
 
                     echo "Branch merging finished successfully!"
 
@@ -245,10 +245,10 @@ Host ${provider}
     IdentitiesOnly yes
 "
 
-        if [ ! -f $HOME/.ssh/config ]; then
+        if [ ! -f "$HOME/.ssh/config" ]; then
             echo "$config_entry" > $HOME/.ssh/config
         else
-            grep -q "$provider" $HOME/.ssh/config || echo "$config_entry" >> $HOME/.ssh/config
+            grep -q "$provider" "$HOME/.ssh/config" || echo "$config_entry" >> "$HOME/.ssh/config"
         fi
     else
         printf "${red}To use this command, please, pass the flags (-p)rovider, (-e)mail and (-u)sername.${reset}\n"
@@ -322,7 +322,7 @@ push_to_vcs() {
     case "$branchAns" in
         *)
             echo "Pushing to $branchAns..."
-            git push origin $branchAns
+            git push origin "$branchAns"
             ;;
     esac
 
