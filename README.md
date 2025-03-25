@@ -10,7 +10,8 @@ This software work is and will forever be free, you are free to modify it as lon
 
 - Give us credit as the creators of the software and a link to the original repository so we can continue sharing awesome things.
 
-If you want your changes to appear in the official versions of this software, create a pull request!
+If you want your changes to appear in the official versions of this software,
+create a pull request!
 
 ### Our mission
 
