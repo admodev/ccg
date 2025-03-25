@@ -141,7 +141,7 @@ show_gitlog() {
 
   echo "Please, select the commit you want to use:"
 
-  cat "/tmp/ccg/gitlog_$TODAY_FULLDATE" | fzf --height 40% > "/tmp/ccg/selected_git_commit_from_log"
+  fzf --height 40% < "/tmp/ccg/gitlog_$TODAY_FULLDATE"  > "/tmp/ccg/selected_git_commit_from_log"
 }
 
 grab_selected_git_commit_from_gitlog() {
@@ -355,7 +355,7 @@ remove_files() {
     case "$filesAns" in
         *)
             echo "Deleting $filesAns"
-            rm -f $filesAns
+            rm -f "$filesAns"
             ;;
     esac
 
