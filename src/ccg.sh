@@ -141,12 +141,12 @@ show_gitlog() {
 
   echo "Please, select the commit you want to use:"
 
-  fzf --height 40% < "/tmp/ccg/gitlog_$TODAY_FULLDATE"  > "/tmp/ccg/selected_git_commit_from_log"
+  fzf --height 40% < "/tmp/ccg/gitlog_$TODAY_FULLDATE" | awk '{ print $1 }' > "/tmp/ccg/selected_git_commit_from_log"
 }
 
 grab_selected_git_commit_from_gitlog() {
   printf "${green}Selected commit: "
-  cat /tmp/ccg/selected_git_commit_from_log | awk '{ print $1 }'
+  cat /tmp/ccg/selected_git_commit_from_log
   printf "${reset}\n"
 }
 
