@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Constants
+TODAY_FULLDATE=$(date +%F | sed s'/-/_/g')
+
 # Output color.
 black=$(tput setaf 0)
 red=$(tput setaf 1)
@@ -338,6 +341,20 @@ remove_files() {
     return 0
 }
 
+show_gitlog() {
+  echo "Fetching git logs..."
+ 
+  sleep 1
+
+  git log --oneline > "/tmp/gitlog_$TODAY_FULLDATE"
+
+  printf "${GREEN}SUCCESS!${reset}"
+
+  sleep 1
+
+  cat "/tmp/gitlog_$TODAY_FULLDATE" | fzf
+}
+
 if [[ $# -eq 0 ]]; then
     usage
     exit 0
@@ -385,6 +402,10 @@ for ARG in "$@"; do
         remove_files
         exit 0
         ;;
+    logs)
+        show_gitlog
+	exit 0
+	;;
     help)
         usage
         exit 0
