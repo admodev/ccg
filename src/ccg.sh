@@ -132,11 +132,29 @@ uuid() {
     echo
 }
 
+show_gitlog() {
+  echo "Fetching git logs..."
+
+  git log --oneline > "/tmp/ccg/gitlog_$TODAY_FULLDATE"
+
+  printf "${green}SUCCESS!${reset}\n"
+
+  echo "Please, select the commit you want to use:"
+
+  cat "/tmp/ccg/gitlog_$TODAY_FULLDATE" | fzf --height 40% > "/tmp/ccg/selected_git_commit_from_log"
+}
+
+grab_selected_git_commit_from_gitlog() {
+  printf "${green}Selected commit: "
+  cat /tmp/ccg/selected_git_commit_from_log | awk '{ print $1 }'
+  printf "${reset}\n"
+}
+
 prompt_merge() {
     DESTINATION_BRANCH=$1
 
     if [[ ! $DESTINATION_BRANCH ]]; then
-        echo ${red}"You need to specify the branch you want to merge."${reset}
+        printf "${red}You need to specify the branch you want to merge.${reset}\n"
         exit 1
     fi
 
@@ -175,7 +193,7 @@ init() {
     mkdir -p -m 777 .git
     declare -a references=("objects" "refs" "refs/heads")
     for name in "${references[@]}"; do
-        mkdir .git/${name}
+        mkdir ".git/${name}"
     done
 
     touch .git/.repos
@@ -214,8 +232,8 @@ set_identity() {
     done
 
     if [ -n "$provider" ] && [ -n "$email" ] && [ -n "$username" ]; then
-        if [ ! -d $dir ]; then
-            mkdir -p $dir
+        if [ ! -d "$dir" ]; then
+            mkdir -p "$dir"
         fi
 
         ssh-keygen -t ed25519 -C "$email" -N "" -f "$HOME/.ssh/id_${provider}_${username}" <<<y >/dev/null 2>&1
@@ -286,7 +304,7 @@ push_to_vcs() {
         [nN]*)
             echo "Please, select files to add: "
             read -e files_to_add
-            git add $files_to_add
+            git add "$files_to_add"
             ;;
         *)
             printf "${red}Please, select a valid option... (y)es or (n)o${reset}\n"
@@ -342,24 +360,6 @@ remove_files() {
     esac
 
     return 0
-}
-
-show_gitlog() {
-  echo "Fetching git logs..."
-
-  git log --oneline > "/tmp/ccg/gitlog_$TODAY_FULLDATE"
-
-  printf "${green}SUCCESS!${reset}\n"
-
-  echo "Please, select the commit you want to use:"
-
-  cat "/tmp/ccg/gitlog_$TODAY_FULLDATE" | fzf --height 40% > "/tmp/ccg/selected_git_commit_from_log"
-}
-
-grab_selected_git_commit_from_gitlog() {
-  printf "${green}Selected commit: "
-  cat /tmp/ccg/selected_git_commit_from_log | awk '{ print $1 }'
-  printf "${reset}\n"
 }
 
 if [[ $# -eq 0 ]]; then
