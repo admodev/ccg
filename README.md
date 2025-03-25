@@ -1,6 +1,6 @@
-# CCG
+# CleanCodersGIT (CCG)
 
-## CleanCodersGIT
+## What is CCG and how can I contribute?
 
 [![Open Source? Yes!](https://badgen.net/badge/Open%20Source%20%3F/Yes%21/blue?icon=github)](https://github.com/Naereen/badges/) [![GPL license](https://img.shields.io/badge/License-GPL-blue.svg)](http://perso.crans.org/besson/LICENSE.html)
 
@@ -23,7 +23,9 @@ Our mission is to ship a piece of software that takes the best parts of mercuria
 
 ### Instructions
 
-To install this software you have to download the latest release from the "releases" section and add it to your path. Then you can use it globally with the ccg command.
+To install this software you have to download the latest release from
+the "releases" section and add it to your path. Then you can use it 
+globally with the ccg command.
 
 For instructions on how to use it run
 
