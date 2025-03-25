@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Pre initialization commands and functions
+mkdir -p "/tmp/ccg/"
+
 # Constants
 TODAY_FULLDATE=$(date +%F | sed s'/-/_/g')
 
@@ -343,16 +346,20 @@ remove_files() {
 
 show_gitlog() {
   echo "Fetching git logs..."
- 
-  sleep 1
 
-  git log --oneline > "/tmp/gitlog_$TODAY_FULLDATE"
+  git log --oneline > "/tmp/ccg/gitlog_$TODAY_FULLDATE"
 
-  printf "${GREEN}SUCCESS!${reset}"
+  printf "${green}SUCCESS!${reset}\n"
 
-  sleep 1
+  echo "Please, select the commit you want to use:"
 
-  cat "/tmp/gitlog_$TODAY_FULLDATE" | fzf
+  cat "/tmp/ccg/gitlog_$TODAY_FULLDATE" | fzf --height 40% > "/tmp/ccg/selected_git_commit_from_log"
+}
+
+grab_selected_git_commit_from_gitlog() {
+  printf "${green}Selected commit: "
+  cat /tmp/ccg/selected_git_commit_from_log | awk '{ print $1 }'
+  printf "${reset}\n"
 }
 
 if [[ $# -eq 0 ]]; then
@@ -404,6 +411,7 @@ for ARG in "$@"; do
         ;;
     logs)
         show_gitlog
+        grab_selected_git_commit_from_gitlog
 	exit 0
 	;;
     help)
