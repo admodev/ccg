@@ -246,7 +246,7 @@ Host ${provider}
 "
 
         if [ ! -f "$HOME/.ssh/config" ]; then
-            echo "$config_entry" > $HOME/.ssh/config
+            echo "$config_entry" > "$HOME/.ssh/config"
         else
             grep -q "$provider" "$HOME/.ssh/config" || echo "$config_entry" >> "$HOME/.ssh/config"
         fi
