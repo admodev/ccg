@@ -266,7 +266,7 @@ status() {
     ;;
   *)
     printf "${red}Please, select a valid version control system...${reset}\n"
-    exit 1
+    status
     ;;
   esac
 }
